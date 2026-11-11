@@ -5,7 +5,7 @@
 - The conductor checks eligibility, collects payment and explicitly approves. Never infer approval from speech, payment, validation or a UI timeout.
 - No extra hardware, passenger app, Aadhaar or biometric storage.
 - Provider secrets stay on the backend. Never put credentials in VITE_* variables.
-- No fake AI or speech results. Gnani is outside the foundation scope.
+- No fake AI or speech results. Gnani speech may use documented APIs only; fixtures must be explicitly labeled and must never masquerade as live transcription.
 
 ## Structure and changes
 - Keep HTTP wiring in backend/app/routes; business/state logic in services; contracts in schemas; persistence in models.

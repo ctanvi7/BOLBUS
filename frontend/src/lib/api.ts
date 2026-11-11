@@ -21,3 +21,19 @@ export const api = {
   edit:(id:string,fields:Fields,version:number)=>request<Ticket>(`/ticket-requests/${id}`,'PUT',{...fields,version}),
   action:(id:string,action:string,body:object)=>request<Ticket>(`/ticket-requests/${id}/${action}`,'POST',body),
 };
+
+export const speechApi = {
+ status:()=>request<import('./types').SpeechStatus>('/speech/status'),
+ parse:(route_id:number,text:string)=>request<import('./types').SpeechResult>('/speech/parse','POST',{route_id,text}),
+ fixture:(route_id:number,name:string)=>request<import('./types').SpeechResult>(`/speech/fixture/${encodeURIComponent(name)}?route_id=${route_id}`,'POST'),
+ async transcribe(route:number,language:string,audio:Blob):Promise<import('./types').SpeechResult>{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),60000);
+  try{
+   const response=await fetch(`${base}/api/speech/transcribe?route_id=${route}&language=${encodeURIComponent(language)}`,{method:'POST',headers:{'Content-Type':'audio/wav'},body:audio,signal:controller.signal});
+   const data=await response.json().catch(()=>null);
+   if(!response.ok)throw new Error(typeof data?.detail==='string'?data.detail:'Speech request failed. Retry or use manual text.');
+   return data;
+  }catch(e){if(e instanceof TypeError||(e instanceof DOMException&&e.name==='AbortError'))throw new Error('Speech connection failed or timed out. Use manual text or retry.');throw e;}
+  finally{clearTimeout(timer);}
+ }
+};

@@ -2,7 +2,7 @@
 
 **Speak. Confirm. Move.**
 
-A functional local conductor-console prototype for a future voice-first ETM copilot. React + TypeScript + Vite + Tailwind, FastAPI, SQLAlchemy, SQLite and Pydantic. Manual entry is fully functional; speech/AI is not connected.
+A functional local conductor-console prototype for a future voice-first ETM copilot. React + TypeScript + Vite + Tailwind, FastAPI, SQLAlchemy, SQLite and Pydantic. Manual entry is functional. Optional Gnani REST speech capture and deterministic text extraction are documented in [speech integration](docs/speech.md); live service requires a server-side key.
 
 > DEMONSTRATION ONLY: DEMO-01 is a fictional corridor. All fares and concession rules are invented training data, not official BMTC information. Approval produces a demo database record, never a valid travel ticket.
 
@@ -102,13 +102,18 @@ docs/           architecture, contracts, scope
 
 The browser retains the unsaved manual draft in local storage, including its stable creation key. Connectivity errors are visible, requests time out, and mutations are not automatically queued or replayed. After an uncertain action, refresh the register before retrying. Server-side validation is authoritative. Local storage is best effort and shared on that browser profile; do not enter personal passenger data. Clearing storage removes recovery.
 
-The UI uses bundled Inter and Noto Kannada/Devanagari fonts without requiring a font CDN. It displays translated demo stop names, not a fully translated interface. No microphone recording is performed.
+The UI uses bundled Inter and Noto Kannada/Devanagari fonts without requiring a font CDN. It displays translated demo stop names, not a fully translated interface. Microphone recording occurs only after an explicit Record action on the speech screen; manual entry does not activate it.
 
 ## Prototype boundaries
 
-This is a local development simulator, not a production service. It has no authentication, trusted conductor identity, official fare ingestion, payment processing, ticket printing, ETM SDK, speech recognition, AI parsing, Gnani integration, or complete offline service-worker/sync support. Do not expose the unauthenticated API on a public network. See [architecture](docs/architecture.md) and [API contracts](docs/api.md) for next steps and precise behavior.
+This is a local development simulator, not a production service. It has no authentication, trusted conductor identity, official fare ingestion, payment processing, ticket printing, ETM SDK, general AI language understanding, or complete offline service-worker/sync support. Do not expose the unauthenticated API on a public network. See [architecture](docs/architecture.md) and [API contracts](docs/api.md) for next steps and precise behavior.
 
 
 ## Deterministic engine
 
 See [ticket engine](docs/ticket-engine.md) for fare-table provenance, exact journey prices, Shakti-style demo checks, API additions, audit evidence and migration details. New and existing SQLite databases are initialized with an additive migration at startup; existing records are preserved. Quotes and approved simulated tickets carry frozen source/version/date information. Missing fares block approval. No official fare or concession dataset is connected.
+
+
+## Speech and manual text
+
+Open Voice entry on Home. Set `SPEECH_MODE=gnani` and `GNANI_API_KEY` in `backend/.env` to enable the documented API adapter, or `SPEECH_MODE=fixture` for explicitly labeled developer samples. Text extraction works with speech disabled. See [speech setup and validation](docs/speech.md). No live Gnani test was possible without credentials.

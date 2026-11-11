@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.database import get_db, get_write_db
+from app.config import settings
 from app.models import Route, TicketRequest, AuditEvent, SimulatedTicket, FareTable, FareEntry, ConcessionRule
 from app.schemas import TicketCreate, TicketEdit, TicketOut, RouteOut, Version, Verification, Approval, State
 from app.services import tickets as service
@@ -13,7 +14,7 @@ router = APIRouter(prefix='/api')
 
 @router.get('/health')
 def health():
-    return {'status': 'ok', 'mode': 'demo', 'speech_available': False}
+    return {'status': 'ok', 'mode': 'demo', 'speech_available': settings.speech_mode == 'gnani' and bool(settings.gnani_api_key and settings.gnani_api_key.get_secret_value().strip())}
 
 
 @router.get('/routes', response_model=list[RouteOut])

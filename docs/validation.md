@@ -20,3 +20,7 @@ Python 3.12 is the recommended runtime. Python 3.14.5 with SQLAlchemy 2.0.36 pro
 ## Deterministic engine verification
 
 Python 3.12: 27 backend tests passed, including alias ambiguity/unknown text, route membership, direction, missing/expired fares, missing concession policies, Shakti-style checks, quantity/payment invalidation, changed quote rejection, four concurrent approval retries, cancellation, database reopen persistence and idempotent legacy-schema migration. All 4 frontend tests and the TypeScript/Vite production build passed. Existing third-party deprecation/future warnings remain non-blocking.
+
+## Speech integration verification
+
+55 backend tests, 8 frontend tests and the TypeScript/Vite build passed. Speech HTTP integration used httpx.MockTransport with Gnani's documented request/response contract. Fixture samples are explicitly labeled. Microphone lifecycle tests mock capture; WAV encoding is independently checked. Real Gnani service and physical microphone end-to-end behavior were not tested because no credentials were available. See docs/speech.md for configuration, scope and remaining verification.

@@ -7,3 +7,6 @@ export interface Fields {service_type?:string; origin_text?:string|null; destina
 export interface Draft extends Fields {client_request_id:string}
 export interface Ticket extends Fields {id:string; client_request_id:string; state:State; concession_verified:boolean; payment_collected:boolean; total_paise:number|null; approved_by:string|null; approved_at:string|null; created_at:string; version:number; issues:string[]; documents_verified?:boolean; quote_snapshot?:string|null}
 export const money = (paise:number|null) => paise === null ? '—' : new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}).format(paise/100);
+export interface SpeechItem {client_request_id?:string;prepared_request_id?:string;destination:string;destination_stop_id:number|null;quantity:number|null;category:string|null;unresolved:string[];candidates:{id:number;name:string}[]}
+export interface SpeechResult {route_id?:number;original_transcription:string;items:SpeechItem[];provider:string;is_fixture:boolean;confidence:null}
+export interface SpeechStatus {mode:'disabled'|'fixture'|'gnani';live_available:boolean;fixtures:string[];max_seconds:number}
