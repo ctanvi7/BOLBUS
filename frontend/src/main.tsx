@@ -1,0 +1,11 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { App } from './App';
+import { ConsoleProvider } from './state/ConsoleContext';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/noto-sans-kannada/kannada-400.css';
+import '@fontsource/noto-sans-devanagari/devanagari-400.css';
+import './styles.css';
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><BrowserRouter><ConsoleProvider><App/></ConsoleProvider></BrowserRouter></React.StrictMode>);

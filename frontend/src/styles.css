@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+ body{@apply bg-cloud text-navy antialiased; font-family:Inter,Manrope,'Noto Sans Kannada','Noto Sans Devanagari',system-ui,sans-serif;}
+ button,input,select{@apply min-h-12;}button{@apply transition-colors font-semibold;}button:disabled{@apply opacity-40 cursor-not-allowed;}
+ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{@apply outline outline-2 outline-offset-4 outline-navy;}
+ h1{@apply text-3xl font-semibold tracking-tight mb-2;}h2{@apply text-xl font-semibold mb-2;}label{@apply block text-sm font-medium;}select,input:not([type=checkbox]){@apply block mt-2 w-full border border-slate-300 rounded-xl px-3 py-3 bg-white text-navy;}input[type=checkbox]{@apply w-5 h-5 min-h-0 accent-navy shrink-0;}dt{@apply text-sm text-slate-500;}dd{@apply font-semibold mt-1;}
+}
+@layer components {
+ .panel{@apply bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm;}.primary{@apply bg-lime text-navy rounded-xl px-5 py-3 hover:bg-lime/80;}.secondary{@apply border border-slate-300 rounded-xl px-4 py-2 hover:bg-cloud;}.muted{@apply text-sm text-slate-600 leading-relaxed;}.eyebrow{@apply text-xs tracking-widest font-semibold text-slate-500 mb-3;}.status{@apply text-xs font-semibold rounded-full px-3 py-2 capitalize;}.check{@apply flex items-center gap-3 leading-relaxed;}.journey{@apply bg-cloud rounded-xl p-5 flex flex-wrap justify-between items-center gap-4;}.error{@apply bg-red-50 text-red-900 border border-red-200 rounded-xl p-4 mb-5;}
+ nav>a{@apply px-4 py-3 rounded-xl text-sm font-semibold;}nav>a.active{@apply bg-navy text-white;}
+}
