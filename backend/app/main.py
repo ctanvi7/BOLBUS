@@ -8,11 +8,12 @@ from app.config import settings
 from app.database import Base, engine, SessionLocal
 from app.routes.api import router
 from app.services.seed import seed_demo
+from app.services.migrations import migrate
 
 
 @asynccontextmanager
 async def lifespan(app):
-    Base.metadata.create_all(engine)
+    migrate(engine)
     with SessionLocal() as db:
         seed_demo(db)
     yield

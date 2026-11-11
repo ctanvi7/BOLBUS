@@ -106,4 +106,9 @@ The UI uses bundled Inter and Noto Kannada/Devanagari fonts without requiring a 
 
 ## Prototype boundaries
 
-This is a local development simulator, not a production service. It has no authentication, trusted conductor identity, official fare ingestion, append-only audit trail, migrations, payment processing, ticket printing, ETM SDK, speech recognition, AI parsing, Gnani integration, or complete offline service-worker/sync support. Do not expose the unauthenticated API on a public network. See [architecture](docs/architecture.md) and [API contracts](docs/api.md) for next steps and precise behavior.
+This is a local development simulator, not a production service. It has no authentication, trusted conductor identity, official fare ingestion, payment processing, ticket printing, ETM SDK, speech recognition, AI parsing, Gnani integration, or complete offline service-worker/sync support. Do not expose the unauthenticated API on a public network. See [architecture](docs/architecture.md) and [API contracts](docs/api.md) for next steps and precise behavior.
+
+
+## Deterministic engine
+
+See [ticket engine](docs/ticket-engine.md) for fare-table provenance, exact journey prices, Shakti-style demo checks, API additions, audit evidence and migration details. New and existing SQLite databases are initialized with an additive migration at startup; existing records are preserved. Quotes and approved simulated tickets carry frozen source/version/date information. Missing fares block approval. No official fare or concession dataset is connected.

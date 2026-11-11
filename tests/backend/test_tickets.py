@@ -43,7 +43,7 @@ def test_concession_requires_manual_check(client):
     assert t['total_paise'] == 2000
     t = action(client,t,'verify',payment_collected=True,concession_verified=False).json()
     assert t['state'] == 'pending-verification'
-    t = action(client,t,'verify',payment_collected=True,concession_verified=True).json()
+    t = action(client,t,'verify',payment_collected=True,concession_verified=True,documents_verified=True).json()
     assert t['state'] == 'ready-for-approval'
 
 
@@ -52,7 +52,7 @@ def test_incomplete_journey_needs_clarification(client,change):
     t, _ = create(client,**change)
     t = action(client,t,'validate').json()
     assert t['state'] == 'needs-clarification' and t['total_paise'] is None
-    assert action(client,t,'verify',payment_collected=True,concession_verified=True).status_code == 409
+    assert action(client,t,'verify',payment_collected=True,concession_verified=True,documents_verified=True).status_code == 409
 
 
 def test_reverse_and_same_stop(client):
@@ -65,7 +65,7 @@ def test_reverse_and_same_stop(client):
 def test_edit_resets_checks_and_stale_revision_rejected(client):
     t, fields = create(client)
     t = action(client,t,'validate').json()
-    t = action(client,t,'verify',payment_collected=True,concession_verified=True).json()
+    t = action(client,t,'verify',payment_collected=True,concession_verified=True,documents_verified=True).json()
     fields.pop('client_request_id')
     response = client.put(f"/api/ticket-requests/{t['id']}",json={**fields,'passenger_count':3,'version':t['version']})
     edited = response.json()

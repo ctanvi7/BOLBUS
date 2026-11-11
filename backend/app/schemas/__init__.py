@@ -1,6 +1,6 @@
 from typing import Literal
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 
 State = Literal['draft', 'needs-clarification', 'pending-verification', 'ready-for-approval', 'approved', 'cancelled']
 
@@ -14,8 +14,17 @@ class TicketFields(StrictModel):
     origin_stop_id: int | None = Field(default=None, gt=0)
     destination_stop_id: int | None = Field(default=None, gt=0)
     passenger_count: int = Field(default=1, ge=1, le=20)
-    category: Literal['standard', 'demo-concession'] = 'standard'
+    category: str = Field(default='standard', min_length=1, max_length=60)
     language: Literal['en-IN', 'kn-IN', 'hi-IN'] = 'en-IN'
+    service_type: str = Field(default='ordinary', min_length=1, max_length=60)
+    origin_text: str | None = Field(default=None, max_length=100)
+    destination_text: str | None = Field(default=None, max_length=100)
+
+    @model_validator(mode='after')
+    def stop_inputs(self):
+        if (self.origin_stop_id is not None and self.origin_text is not None) or (self.destination_stop_id is not None and self.destination_text is not None):
+            raise ValueError('Supply a stop ID or text, not both')
+        return self
 
 
 class TicketCreate(TicketFields):
@@ -31,12 +40,19 @@ class Version(StrictModel):
 
 
 class Verification(Version):
-    concession_verified: bool
-    payment_collected: bool
+    concession_verified: StrictBool
+    payment_collected: StrictBool
+    documents_verified: StrictBool = False
 
 
 class Approval(Version):
-    confirmed: Literal[True]
+    confirmed: StrictBool
+
+    @model_validator(mode='after')
+    def explicit_confirmation(self):
+        if self.confirmed is not True:
+            raise ValueError('Explicit confirmation required')
+        return self
     conductor_name: str = Field(min_length=1, max_length=80, pattern=r'.*\S.*')
 
 
@@ -51,13 +67,19 @@ class TicketOut(BaseModel):
     category: str
     language: str
     state: State
-    concession_verified: bool
-    payment_collected: bool
+    concession_verified: StrictBool
+    payment_collected: StrictBool
+    documents_verified: StrictBool = False
     total_paise: int | None
     approved_by: str | None
     approved_at: str | None
     created_at: str
     version: int
+    service_type: str
+    origin_text: str | None
+    destination_text: str | None
+    documents_verified: bool
+    quote_snapshot: str | None
     issues: list[str] = []
 
 
@@ -87,3 +109,4 @@ class RouteOut(BaseModel):
     is_demo: bool
     stops: list[StopOut]
     fare_rules: list[FareOut]
+    service_types: list[str] = []

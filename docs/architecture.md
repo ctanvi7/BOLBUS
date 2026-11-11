@@ -1,3 +1,5 @@
+> Updated engine behavior is documented in [ticket-engine.md](ticket-engine.md). It adds versioned exact fare tables, policy checks, quote snapshots, serialized SQLite writes, additive startup migration, audit events and simulated ticket records. The foundation notes below describe the original baseline.
+
 # Architecture and scope
 
 React Router provides create, register and request detail pages. ConsoleContext shares route/request data, mutation status and errors; forms keep local state. Typed API utilities send JSON through the Vite proxy to FastAPI. HTTP routes delegate to services, Pydantic schemas and SQLAlchemy models. SQLite stores routes, ordered multilingual stops, fare rules and requests with foreign keys.

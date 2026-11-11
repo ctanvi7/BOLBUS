@@ -1,3 +1,5 @@
+> The deterministic engine extends these foundation contracts. See [ticket-engine.md](ticket-engine.md) for service types, text stop resolution, strict document verification, quote snapshots, audit and simulated ticket endpoints. Concessions now require both eligibility and document confirmation.
+
 # API contracts
 
 Base `/api`. JSON only. Generated schemas: `/openapi.json`; interactive reference: `/docs`.

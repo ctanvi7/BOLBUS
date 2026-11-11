@@ -26,8 +26,8 @@ describe('conductor workflow',()=>{
   localStorage.clear();const fetch=mockServer(); const user=userEvent.setup();
   render(<MemoryRouter><ConsoleProvider><App/></ConsoleProvider></MemoryRouter>);
   await screen.findByLabelText('Boarding stop');
-  await user.selectOptions(screen.getByLabelText('Boarding stop'),'1');await user.selectOptions(screen.getByLabelText('Destination'),'2');
-  await user.click(screen.getByRole('button',{name:'Save draft & review →'}));
+  await user.selectOptions(screen.getByLabelText('Boarding stop'),'1');await user.click(screen.getByRole('button',{name:/Lake/}));
+  await user.click(screen.getByRole('button',{name:/Continue to fare & approval/}));
   const approve=await screen.findByRole('button',{name:'Approve demo request'});expect(approve).toBeDisabled();
   await user.click(screen.getByRole('button',{name:'Validate request'}));
   await user.click(await screen.findByLabelText('I collected payment'));
@@ -40,7 +40,7 @@ describe('conductor workflow',()=>{
  it('retains local drafts on network failure and displays an error',async()=>{
   localStorage.setItem(DRAFT_KEY,JSON.stringify(draft));const fetch=mockServer();const user=userEvent.setup();
   render(<MemoryRouter><ConsoleProvider><App/></ConsoleProvider></MemoryRouter>);await screen.findByLabelText('Boarding stop');
-  fetch.mockRejectedValue(new TypeError('network'));await user.click(screen.getByRole('button',{name:'Save draft & review →'}));
+  fetch.mockRejectedValue(new TypeError('network'));await user.click(screen.getByRole('button',{name:/Continue to fare & approval/}));
   expect(await screen.findByRole('alert')).toHaveTextContent('Server unreachable');expect(readDraft()?.client_request_id).toBe(draft.client_request_id);fetch.mockRestore();
  });
  it('rejects corrupt draft data',()=>{localStorage.setItem(DRAFT_KEY,'bad json');expect(readDraft()).toBeNull();localStorage.setItem(DRAFT_KEY,JSON.stringify({...draft,passenger_count:0}));expect(readDraft()).toBeNull();});

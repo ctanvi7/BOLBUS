@@ -24,3 +24,13 @@ SessionLocal = sessionmaker(engine, expire_on_commit=False)
 def get_db():
     with SessionLocal() as db:
         yield db
+
+
+def get_write_db():
+    # Acquire SQLite's write reservation before reading the version or quote.
+    # All ticket mutations use this dependency, including creation and approval.
+    from sqlalchemy import text
+    with SessionLocal() as db:
+        if engine.dialect.name == 'sqlite':
+            db.execute(text('BEGIN IMMEDIATE'))
+        yield db

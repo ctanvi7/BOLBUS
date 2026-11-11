@@ -16,3 +16,7 @@ Non-blocking third-party warnings: Starlette TestClient's AnyIO alias deprecatio
 A fresh virtual environment on Python 3.12.14 installed the unchanged six direct dependency pins in backend/requirements.txt successfully, including SQLAlchemy 2.0.36. `pip check` reported no broken requirements; all 16 backend tests passed. SQLAlchemy model import/initialization also passed when run from backend/. This verification ran on Linux; native Windows installation was not executed here.
 
 Python 3.12 is the recommended runtime. Python 3.14.5 with SQLAlchemy 2.0.36 produced the user-reported typing.Union descriptor failure; that combination is not supported for this foundation. No dependency upgrades or business logic changes were needed. Transitive dependencies remain resolver-selected, not fully locked. The existing AnyIO alias deprecation warning is non-blocking.
+
+## Deterministic engine verification
+
+Python 3.12: 27 backend tests passed, including alias ambiguity/unknown text, route membership, direction, missing/expired fares, missing concession policies, Shakti-style checks, quantity/payment invalidation, changed quote rejection, four concurrent approval retries, cancellation, database reopen persistence and idempotent legacy-schema migration. All 4 frontend tests and the TypeScript/Vite production build passed. Existing third-party deprecation/future warnings remain non-blocking.
