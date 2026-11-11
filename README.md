@@ -121,3 +121,7 @@ Open Voice entry on Home. Set `SPEECH_MODE=gnani` and `GNANI_API_KEY` in `backen
 ## Batch review and interruption recovery
 
 Voice/text extraction can be saved as a persisted batch using **Save entire batch to pending queue**. Resume from **Pending requests → Saved batches**, save reviewed details per item, and prepare each request through the deterministic engine. Each ticket still needs individual verification and explicit approval. See [batch workflow, APIs and recovery](docs/batch-ticketing.md). Unsaved edits are retained locally with stale-version protection; saved batches survive server/browser restarts. `python scripts/benchmark_batches.py` measures synthetic batch preparation separately from speech latency.
+
+## Hackathon demonstration
+
+Use **Compare demo** in the conductor navigation for a matched manual-versus-BOLBUS ticket task. It records only observed browser-local attempts; results are prototype measurements, not BMTC deployment benchmarks. Both modes use the real demo ticket endpoints and require conductor verification and approval. See the [three-minute demo runbook](docs/demo-runbook.md) for setup, narration, preflight and limitations. The seeded route is the fictional DEMO-01 training corridor; it is not BMTC route or fare data.

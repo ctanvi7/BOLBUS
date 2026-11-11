@@ -7,7 +7,7 @@ Foundation checked on Python 3.12 and Node 24:
 - TypeScript and Vite production build: successful, including bundled Inter and Unicode fonts.
 - FastAPI bootstrap starts successfully and creates demo schema/catalog.
 
-A real Chromium smoke check was attempted but the execution environment denied the browser's Unix socket creation before it could open the app. Visual desktop/mobile verification and a browser-to-live-API smoke test remain unverified. Frontend flow tests use mocked HTTP responses; backend contract behavior is independently tested against isolated SQLite databases.
+A real Chromium smoke check was previously blocked by browser Unix-socket permissions. Visual desktop/mobile verification remains unverified. Frontend flow tests use mocked HTTP responses; backend contract behavior is independently tested against isolated SQLite databases.
 
 Non-blocking third-party warnings: Starlette TestClient's AnyIO alias deprecation and React Router v7 future flags. No runtime AI/speech integration has been tested or claimed.
 
@@ -28,3 +28,7 @@ Python 3.12: 27 backend tests passed, including alias ambiguity/unknown text, ro
 ## Batch and interruption recovery
 
 61 backend tests, 12 frontend tests, TypeScript/Vite build passed. New coverage includes distinct multi-destination clauses, code mixing, route-only alternatives, server persistence/reopen, stale recovery, cancellation, concurrent prepare/approve retries, mixed concessions and partial failure. UI tests simulate interrupted navigation/refresh by remounting against retained storage; no real browser or real Gnani E2E claim is made. A reproducible 20-batch/3-item benchmark measured median server preparation 21.69 ms and maximum 35.84 ms, excluding commit/network/STT. See docs/batch-ticketing.md.
+
+## Hackathon demo readiness
+
+Latest run: Python 3.12 backend tests **61 passed**; Vitest **14 passed**; TypeScript/Vite production build passed. Added a comparison flow test that completes equivalent manual and typed-transcript requests through the real approval state path using mocked frontend HTTP responses. A local HTTP smoke check returned frontend 200, backend health `ok`, and the seeded fictional route. No visual physical-browser review or Gnani live credential test was performed. See [demo runbook](demo-runbook.md) for measurement definitions and the scripted walkthrough.

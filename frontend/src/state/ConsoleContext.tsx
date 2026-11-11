@@ -3,6 +3,8 @@ import { api } from '../lib/api';
 import type { Route, Ticket } from '../lib/types';
 function useConsoleState(){
   const [routes,setRoutes] = useState<Route[]>([]), [tickets,setTickets] = useState<Ticket[]>([]);
+  const [activeRouteId,setActiveRouteIdState] = useState<number>(()=>Number(localStorage.getItem('bolbus.active-route')??0));
+  const setActiveRouteId=(id:number)=>{setActiveRouteIdState(id);try{localStorage.setItem('bolbus.active-route',String(id));}catch{}}
   const [error,setError] = useState(''), [loading,setLoading] = useState(true), [busy,setBusy] = useState(false);
   const [refreshRevision,setRefreshRevision] = useState(0);
   const [online,setOnline] = useState(navigator.onLine);
@@ -17,7 +19,7 @@ function useConsoleState(){
     try {const ticket=await work();setTickets(list=>[ticket,...list.filter(t=>t.id!==ticket.id)]);return ticket;}
     catch(e){setError((e as Error).message);return null;}finally{setBusy(false);}
   }
-  return {refreshRevision,routes,tickets,error,setError,loading,busy,online,refresh,mutate};
+  return {refreshRevision,routes,tickets,error,setError,loading,busy,online,refresh,mutate,activeRouteId,setActiveRouteId};
 }
 const Context = createContext<ReturnType<typeof useConsoleState>|null>(null);
 export function ConsoleProvider({children}:{children:ReactNode}){const value=useConsoleState();return <Context.Provider value={value}>{children}</Context.Provider>;}

@@ -35,7 +35,7 @@ describe('conductor workflow',()=>{
   await waitFor(()=>expect(screen.getByText('ready for approval')).toBeInTheDocument());
   await user.type(screen.getByLabelText('Conductor name'),'Tanvi');expect(approve).toBeDisabled();
   await user.click(screen.getByLabelText('I approve this demo request'));expect(approve).toBeEnabled();
-  await user.click(approve);await screen.findByText('Demo request approved');expect(screen.getByText('This is not a valid travel ticket.')).toBeInTheDocument();fetch.mockRestore();
+  await user.click(approve);await screen.findByText('Demo request approved');expect(screen.getByText(/does not represent payment settlement or a valid travel ticket/)).toBeInTheDocument();fetch.mockRestore();
  });
  it('retains local drafts on network failure and displays an error',async()=>{
   localStorage.setItem(DRAFT_KEY,JSON.stringify(draft));const fetch=mockServer();const user=userEvent.setup();
@@ -43,6 +43,6 @@ describe('conductor workflow',()=>{
   fetch.mockRejectedValue(new TypeError('network'));await user.click(screen.getByRole('button',{name:/Continue to fare & approval/}));
   expect(await screen.findByRole('alert')).toHaveTextContent('Server unreachable');expect(readDraft()?.client_request_id).toBe(draft.client_request_id);fetch.mockRestore();
  });
- it('rejects corrupt draft data',()=>{localStorage.setItem(DRAFT_KEY,'bad json');expect(readDraft()).toBeNull();localStorage.setItem(DRAFT_KEY,JSON.stringify({...draft,passenger_count:0}));expect(readDraft()).toBeNull();});
+ it('rejects corrupt drafts and restores configured concession drafts',()=>{localStorage.setItem(DRAFT_KEY,'bad json');expect(readDraft()).toBeNull();localStorage.setItem(DRAFT_KEY,JSON.stringify({...draft,passenger_count:0}));expect(readDraft()).toBeNull();localStorage.setItem(DRAFT_KEY,JSON.stringify({...draft,category:'shakti-demo'}));expect(readDraft()?.category).toBe('shakti-demo');});
  it('reports API conflict messages',async()=>{const fetch=vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({detail:'Request changed'}),{status:409}));await expect(api.action('x','cancel',{version:1})).rejects.toThrow('Request changed');fetch.mockRestore();});
 });
