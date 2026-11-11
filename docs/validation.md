@@ -1,0 +1,12 @@
+# Validation record
+
+Foundation checked on Python 3.12 and Node 24:
+
+- Pytest: 16 passing backend cases (state transitions, explicit approval, concessions, partial/reversed journeys, edit invalidation, stale versions, idempotent creation/approval, terminal immutability, malformed inputs, foreign-route stops, disclosures and missing resources).
+- Vitest: 4 passing frontend cases (complete conductor flow, approval confirmation gating, failed-network draft retention, corrupt recovery and API conflict reporting).
+- TypeScript and Vite production build: successful, including bundled Inter and Unicode fonts.
+- FastAPI bootstrap starts successfully and creates demo schema/catalog.
+
+A real Chromium smoke check was attempted but the execution environment denied the browser's Unix socket creation before it could open the app. Visual desktop/mobile verification and a browser-to-live-API smoke test remain unverified. Frontend flow tests use mocked HTTP responses; backend contract behavior is independently tested against isolated SQLite databases.
+
+Non-blocking third-party warnings: Starlette TestClient's AnyIO alias deprecation and React Router v7 future flags. No runtime AI/speech integration has been tested or claimed.
