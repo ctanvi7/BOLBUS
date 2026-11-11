@@ -8,36 +8,54 @@ A functional local conductor-console prototype for a future voice-first ETM copi
 
 ## Quick start
 
-Requires Python 3.12+ and Node 22+ with npm. From the repository root:
+Use **Python 3.12** for the backend and Node 22+ with npm. Python 3.14 is not supported by the current dependency set: the reported SQLAlchemy 2.0.36 model initialization error occurred on Python 3.14.5. Do not use an unqualified `python -m venv` when multiple Python versions are installed. `.python-version` selects 3.12 for compatible version managers; it does not install Python or change an existing virtual environment. CI also uses Python 3.12.
 
-```bash
-python -m venv .venv
-# Linux/macOS
-source .venv/bin/activate
-# Windows PowerShell instead:
-# .venv\Scripts\Activate.ps1
-python -m pip install -r backend/requirements.txt
+### Windows PowerShell
+
+Install Python 3.12, then run from the repository root:
+
+```powershell
+py -3.12 --version
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe --version
+.\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+.\.venv\Scripts\python.exe -m pip check
 npm ci --prefix frontend
+Copy-Item .env.example backend\.env
 ```
 
-Copy `.env.example` to `backend/.env` (the defaults also work without a file).
+If `.venv` was created using Python 3.14, stop running servers and deactivate it first (run `deactivate` if activated). Rename it with `Rename-Item .venv .venv-python314-backup`, then create the new environment with `py -3.12 -m venv .venv`. Reinstall requirements; do not reuse the old environment's site-packages. Your SQLite database and `.env` are outside `.venv`; keep them. Only copy `.env.example` if `backend/.env` does not already exist.
 
-Terminal 1, with the virtual environment activated:
+Terminal 1, from the repository root:
 
-```bash
+```powershell
 cd backend
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Terminal 2, from the repository root:
 
-```bash
+```powershell
 npm run dev --prefix frontend
 ```
 
-Open **http://localhost:5173**. Interactive API contracts are at **http://127.0.0.1:8000/docs**. Vite proxies `/api` to FastAPI. On first backend start, tables and demo data are created automatically. SQLite persists at `backend/bolbus.db` when started as above. Stop the backend before deleting this file to reset the demo.
+These commands use the virtual environment directly, so activation and PowerShell execution-policy changes are unnecessary.
 
-On Linux/macOS, `make setup`, `make backend`, `make frontend`, `make test`, and `make build` wrap these commands. For Windows use the explicit commands above and below.
+### Linux/macOS
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r backend/requirements.txt
+npm ci --prefix frontend
+# Only if backend/.env does not already exist:
+cp .env.example backend/.env
+cd backend
+../.venv/bin/python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Run `npm run dev --prefix frontend` in another terminal from the repository root. `make setup` requires `python` to resolve to Python 3.12; otherwise use the explicit commands above.
+
+Open **http://127.0.0.1:5173**. Interactive API contracts are at **http://127.0.0.1:8000/docs**. Vite proxies `/api` to FastAPI. On first backend start, tables and demo data are created automatically. SQLite persists at `backend/bolbus.db` when started as above. Stop the backend before deleting this file to reset the demo.
 
 ## Try the workflow
 
@@ -50,12 +68,14 @@ On Linux/macOS, `make setup`, `make backend`, `make frontend`, `make test`, and 
 
 ## Verification
 
-```bash
-# From root with virtual environment activated
-python -m pytest
+```powershell
+# Windows PowerShell, from repository root
+.\.venv\Scripts\python.exe -m pytest
 npm test --prefix frontend
 npm run build --prefix frontend
 ```
+
+On Linux/macOS run `.venv/bin/python -m pytest` from the root.
 
 Backend tests cover state transitions, malformed data, route membership, concession/payment gating, stale updates, terminal immutability, persistence reads and retry safety. Frontend tests exercise the conductor flow, explicit approval, draft recovery and network/conflict errors. GitHub Actions runs both suites and the TypeScript/Vite build.
 
