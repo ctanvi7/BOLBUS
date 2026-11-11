@@ -24,3 +24,7 @@ Python 3.12: 27 backend tests passed, including alias ambiguity/unknown text, ro
 ## Speech integration verification
 
 55 backend tests, 8 frontend tests and the TypeScript/Vite build passed. Speech HTTP integration used httpx.MockTransport with Gnani's documented request/response contract. Fixture samples are explicitly labeled. Microphone lifecycle tests mock capture; WAV encoding is independently checked. Real Gnani service and physical microphone end-to-end behavior were not tested because no credentials were available. See docs/speech.md for configuration, scope and remaining verification.
+
+## Batch and interruption recovery
+
+61 backend tests, 12 frontend tests, TypeScript/Vite build passed. New coverage includes distinct multi-destination clauses, code mixing, route-only alternatives, server persistence/reopen, stale recovery, cancellation, concurrent prepare/approve retries, mixed concessions and partial failure. UI tests simulate interrupted navigation/refresh by remounting against retained storage; no real browser or real Gnani E2E claim is made. A reproducible 20-batch/3-item benchmark measured median server preparation 21.69 ms and maximum 35.84 ms, excluding commit/network/STT. See docs/batch-ticketing.md.

@@ -132,3 +132,29 @@ class SimulatedTicket(Base):
     total_paise: Mapped[int]
     approved_by: Mapped[str]
     created_at: Mapped[str] = mapped_column(default=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class TicketBatch(Base):
+    __tablename__ = 'ticket_batches'
+    id: Mapped[str] = mapped_column(primary_key=True, default=lambda: str(uuid4()))
+    client_batch_id: Mapped[str] = mapped_column(unique=True)
+    route_id: Mapped[int] = mapped_column(ForeignKey('routes.id'))
+    original_transcription: Mapped[str]
+    source: Mapped[str]
+    creation_payload: Mapped[str]
+    created_at: Mapped[str] = mapped_column(default=lambda: datetime.now(timezone.utc).isoformat())
+    items: Mapped[list['BatchItem']] = relationship(order_by='BatchItem.position')
+
+
+class BatchItem(Base):
+    __tablename__ = 'batch_items'
+    __table_args__ = (UniqueConstraint('batch_id', 'position'),)
+    id: Mapped[str] = mapped_column(primary_key=True, default=lambda: str(uuid4()))
+    batch_id: Mapped[str] = mapped_column(ForeignKey('ticket_batches.id'))
+    position: Mapped[int]
+    draft_json: Mapped[str]
+    ticket_request_id: Mapped[str | None] = mapped_column(ForeignKey('ticket_requests.id'), unique=True)
+    cancelled: Mapped[bool] = mapped_column(default=False)
+    last_error: Mapped[str | None]
+    version: Mapped[int] = mapped_column(default=1)
+    __mapper_args__ = {'version_id_col': version}

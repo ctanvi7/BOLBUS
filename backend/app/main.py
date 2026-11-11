@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import StaleDataError
 from app.config import settings
 from app.database import Base, engine, SessionLocal
 from app.routes.api import router
+from app.routes.batches import router as batch_router
 from app.routes.speech import router as speech_router
 from app.services.seed import seed_demo
 from app.services.migrations import migrate
@@ -23,6 +24,7 @@ async def lifespan(app):
 app = FastAPI(title='BOLBUS Demo API', version='0.1.0', lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=['GET', 'POST', 'PUT'], allow_headers=['Content-Type'])
 app.include_router(router)
+app.include_router(batch_router)
 app.include_router(speech_router)
 
 

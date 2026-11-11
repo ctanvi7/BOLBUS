@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from fastapi import HTTPException
 from sqlalchemy import select
-from app.models import TicketRequest, Route, Stop, FareTable, FareEntry, FareRule, AuditEvent, SimulatedTicket
+from app.models import TicketRequest, Route, Stop, FareTable, FareEntry, FareRule, BatchItem, AuditEvent, SimulatedTicket
 from app.schemas import TicketOut
 from app.services.route_engine import resolve
 from app.services.fare_engine import quote, serialize
@@ -79,6 +79,7 @@ def validate(db, ticket):
 
 def output(db, ticket):
     result = TicketOut.model_validate(ticket)
+    result.batch_id = db.scalar(select(BatchItem.batch_id).where(BatchItem.ticket_request_id == ticket.id))
     if ticket.state not in ('approved', 'cancelled'):
         result.issues = evaluate(db, ticket)[2]
     return result

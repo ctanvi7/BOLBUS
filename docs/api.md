@@ -36,3 +36,5 @@ Example approval:
 Errors use FastAPI's `detail` envelope: 404 missing request; 422 malformed data, unknown route/category or foreign stop; 409 stale version, invalid transition, terminal record or key conflict; 503 database unavailable. Missing/reversed journeys validate successfully into `needs-clarification` with issues.
 
 Creation retries compare the submitted fields with the current saved fields. If edited since creation, the original payload may conflict; read the register and use the saved ID. Approval retries accept only the immediately preceding version and same conductor name. No browser mutation is automatically retried. No authentication is implemented; use locally only.
+
+Batch preparation APIs, per-item versions and nullable `TicketOut.batch_id` are documented in [batch-ticketing.md](batch-ticketing.md). Batch preparation never approves tickets.

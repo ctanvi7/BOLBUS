@@ -117,3 +117,7 @@ See [ticket engine](docs/ticket-engine.md) for fare-table provenance, exact jour
 ## Speech and manual text
 
 Open Voice entry on Home. Set `SPEECH_MODE=gnani` and `GNANI_API_KEY` in `backend/.env` to enable the documented API adapter, or `SPEECH_MODE=fixture` for explicitly labeled developer samples. Text extraction works with speech disabled. See [speech setup and validation](docs/speech.md). No live Gnani test was possible without credentials.
+
+## Batch review and interruption recovery
+
+Voice/text extraction can be saved as a persisted batch using **Save entire batch to pending queue**. Resume from **Pending requests → Saved batches**, save reviewed details per item, and prepare each request through the deterministic engine. Each ticket still needs individual verification and explicit approval. See [batch workflow, APIs and recovery](docs/batch-ticketing.md). Unsaved edits are retained locally with stale-version protection; saved batches survive server/browser restarts. `python scripts/benchmark_batches.py` measures synthetic batch preparation separately from speech latency.

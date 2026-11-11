@@ -1,7 +1,7 @@
 """Conservative grammar extraction only. No fare/eligibility decisions or LLM."""
 import re
 from pydantic import BaseModel, Field
-from app.services.route_engine import normalize, resolve
+from app.services.route_engine import normalize, resolve, suggestions
 
 NUMBERS = {'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,
     'ondu':1,'eradu':2,'mooru':3,'muru':3,'naalku':4,'aidu':5,'ಒಂದು':1,'ಎರಡು':2,'ಮೂರು':3,'ನಾಲ್ಕು':4,'ಐದು':5,
@@ -63,5 +63,5 @@ def parse(db, route_id, text):
             quantity, category = None, None
             result['stop_id'] = None
         items.append(ExtractedItem(destination=destination, destination_stop_id=result['stop_id'], quantity=quantity,
-            category=category, unresolved=unresolved, candidates=result['candidates']))
+            category=category, unresolved=unresolved, candidates=result['candidates'] or suggestions(db, route_id, destination)))
     return Extraction(original_transcription=text, items=items)

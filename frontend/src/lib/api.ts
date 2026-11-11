@@ -37,3 +37,12 @@ export const speechApi = {
   finally{clearTimeout(timer);}
  }
 };
+
+export const batchApi={
+ list:()=>request<import('./types').TicketBatch[]>('/batches'),
+ get:(id:string)=>request<import('./types').TicketBatch>(`/batches/${id}`),
+ create:(data:object)=>request<import('./types').TicketBatch>('/batches','POST',data),
+ edit:(batch:string,item:string,version:number,draft:import('./types').BatchDraft)=>request<import('./types').TicketBatch>(`/batches/${batch}/items/${item}`,'PUT',{version,draft}),
+ cancel:(batch:string,item:string,version:number)=>request<import('./types').TicketBatch>(`/batches/${batch}/items/${item}/cancel`,'POST',{version}),
+ prepare:(batch:string,versions:Record<string,number>)=>request<{batch:import('./types').TicketBatch;processing_ms:number;results:{item_id:string;ok:boolean;error?:string}[]}>(`/batches/${batch}/prepare`,'POST',{versions}),
+};

@@ -80,6 +80,7 @@ class TicketOut(BaseModel):
     destination_text: str | None
     documents_verified: bool
     quote_snapshot: str | None
+    batch_id: str | None = None
     issues: list[str] = []
 
 
