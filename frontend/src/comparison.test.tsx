@@ -2,18 +2,20 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import * as audio from './lib/audio';
+import { speechApi } from './lib/api';
 import { App } from './App';
 import { ConsoleProvider } from './state/ConsoleContext';
 
 const route={id:1,code:'DEMO-01',name:'Fictional training corridor',is_demo:true,service_types:['ordinary'],stops:[{id:1,position:0,name:'Central',name_kn:'ಕೇಂದ್ರ',name_hi:'केंद्र'},{id:2,position:1,name:'Market',name_kn:'ಮಾರುಕಟ್ಟೆ',name_hi:'बाज़ार'},{id:5,position:4,name:'Lake',name_kn:'ಕೆರೆ',name_hi:'झील'}],fare_rules:[{category:'standard',label:'Standard demo',per_stage_paise:500,verification_required:false,source:'Synthetic training data'}]};
-function setup(){
+function setup(multiple=false){
  let ticket:any=null;let revision=0;
  const fetch=vi.spyOn(globalThis,'fetch').mockImplementation(async(input,init)=>{
   const url=String(input),method=init?.method??'GET';
   if(url.endsWith('/routes'))return new Response(JSON.stringify([route]));
   if(url.endsWith('/ticket-requests')&&method==='GET')return new Response(JSON.stringify(ticket?[ticket]:[]));
   if(url.endsWith('/speech/status'))return new Response(JSON.stringify({mode:'disabled',live_available:false,fixtures:[],max_seconds:29}));
-  if(url.endsWith('/speech/parse'))return new Response(JSON.stringify({route_id:1,original_transcription:'Two standard tickets to Lake',provider:'deterministic-v1',is_fixture:false,confidence:null,items:[{destination:'Lake',destination_stop_id:5,quantity:2,category:'standard',unresolved:[],candidates:[]}]}));
+  if(url.endsWith('/speech/parse'))return new Response(JSON.stringify({route_id:1,original_transcription:'Two standard tickets to Lake',provider:'deterministic-v1',is_fixture:false,confidence:null,items:[...(multiple?[{destination:'Market',destination_stop_id:2,quantity:1,category:'standard',unresolved:[],candidates:[]}]:[]),{destination:'Lake',destination_stop_id:5,quantity:2,category:'standard',unresolved:[],candidates:[]}]}));
   const body=JSON.parse(String(init?.body??'{}'));
   if(url.endsWith('/ticket-requests')&&method==='POST'){ticket={...body,id:`ticket-${++revision}`,state:'draft',version:1,issues:[],total_paise:null,payment_collected:false,concession_verified:false,documents_verified:false,approved_by:null,approved_at:null,created_at:new Date().toISOString()};return new Response(JSON.stringify(ticket),{status:201});}
   if(url.includes('/ticket-requests/')&&method==='GET')return new Response(JSON.stringify(ticket));
@@ -58,6 +60,15 @@ describe('prototype comparison flow',()=>{
   expect(rows[1]).toHaveTextContent('A · Manual');expect(rows[1]).not.toHaveTextContent('Not run');
   expect(rows[2]).toHaveTextContent('B · BOLBUS');expect(rows[2]).not.toHaveTextContent('Not run');
   expect(rows[2]).toHaveTextContent('2');
+ });
+ it('rejects multiple destinations instead of silently discarding passengers',async()=>{
+  setup(true);const user=userEvent.setup();mount();await user.click(await screen.findByRole('button',{name:'Start BOLBUS attempt →'}));await user.type(screen.getByLabelText('Spoken request transcript'),'One Market, two Lake');await user.click(screen.getByRole('button',{name:'Extract ticket details'}));expect(await screen.findByRole('alert')).toHaveTextContent('exactly one request');expect(screen.getByRole('button',{name:'Save reviewed ticket draft →'})).toBeDisabled();
+ });
+ it('automatic recording limit stops and submits the existing microphone capture',async()=>{
+  setup();vi.spyOn(speechApi,'status').mockResolvedValue({mode:'gnani',live_available:true,fixtures:[],max_seconds:30});
+  let limit:()=>void=()=>{};const stop=vi.fn(()=>new Blob(['wav']));const capture=vi.spyOn(audio,'captureAudio').mockImplementation(async cb=>{limit=cb;return {stop,cancel:vi.fn()};});
+  vi.spyOn(speechApi,'transcribe').mockRejectedValue(new Error('Mock service unavailable'));
+  const user=userEvent.setup();mount();await user.click(await screen.findByRole('button',{name:'Start BOLBUS attempt →'}));await user.click(await screen.findByRole('button',{name:'● Record request'}));limit();await waitFor(()=>expect(stop).toHaveBeenCalledTimes(1));expect(capture).toHaveBeenCalledTimes(1);
  });
  it('requires explicit category after transcript extraction when speech omits it',async()=>{
   setup();vi.spyOn(globalThis,'fetch').mockImplementation(async(input,init)=>{if(String(input).endsWith('/speech/parse'))return new Response(JSON.stringify({route_id:1,original_transcription:'Two tickets to Lake',provider:'deterministic-v1',is_fixture:false,confidence:null,items:[{destination:'Lake',destination_stop_id:5,quantity:2,category:null,unresolved:['Choose a category; none was reliably stated.'],candidates:[]}]}));return new Response(JSON.stringify([route]));});

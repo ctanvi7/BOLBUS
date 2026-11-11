@@ -16,7 +16,10 @@ export async function request<T>(path:string, method='GET', body?:unknown):Promi
   } finally {clearTimeout(timeout);}
 }
 export const api = {
-  routes:()=>request<Route[]>('/routes'), tickets:()=>request<Ticket[]>('/ticket-requests'),
+  routes:()=>request<Route[]>('/routes'), async tickets():Promise<Ticket[]> {
+    const all:Ticket[]=[];let offset=0;
+    while(true){const page=await request<Ticket[]>(offset===0?'/ticket-requests':`/ticket-requests?limit=100&offset=${offset}`);all.push(...page);if(page.length<100)return [...new Map(all.map(t=>[t.id,t])).values()];offset+=page.length;}
+  },
   create:(data:Draft)=>request<Ticket>('/ticket-requests','POST',data),
   edit:(id:string,fields:Fields,version:number)=>request<Ticket>(`/ticket-requests/${id}`,'PUT',{...fields,version}),
   action:(id:string,action:string,body:object)=>request<Ticket>(`/ticket-requests/${id}/${action}`,'POST',body),
